@@ -1,0 +1,262 @@
+import pandas
+import math
+
+#Linhas ordenadas
+lines = [
+          [1, 2, 3, 4, 5, 6], #azul
+          [2, 5, 7, 8, 9, 10], #amarela
+          [3, 9, 11, 13],#vermelha
+          [4, 8, 12, 13, 14]#verde
+]
+
+line1 = [0, 1, 2, 3, 4, 5]
+line2 = [1, 4, 6, 7, 8, 9]
+line3 = [2, 8, 10, 12]
+line4 = [3, 7, 11, 12, 13]
+
+dir_dist = [
+            [0, 10, 18.5, 24.8, 36.4, 38.8, 35.8, 25.4, 17.6, 9.1, 16.7, 27.3, 27.6, 29.8],
+            [0, 0, 8.5, 14.8, 26.6, 29.1, 26.1, 17.3, 10, 3.5, 15.5, 20.9, 19.1, 21.8],
+            [0, 0, 0, 6.3, 18.2, 20.6, 17.6, 13.6, 9.4, 10.3, 19.5, 19.1, 12.1, 16.6],
+            [0, 0, 0, 0, 12, 14.4, 11.5, 12.4, 12.6, 16.7, 23.6, 18.6, 10.6, 15.4],
+            [0, 0, 0, 0, 0, 3, 2.4, 19.4, 23.3, 28.2, 34.2, 24.8, 14.5, 17.9],
+            [0, 0, 0, 0, 0, 0, 3.3, 22.3, 25.7, 30.3, 36.7, 27.6, 15.2, 18.2],
+            [0, 0, 0, 0, 0, 0, 0, 20, 23, 27.3, 34.2, 25.7, 12.4, 15.6],
+            [0, 0, 0, 0, 0, 0, 0, 0, 8.2, 20.3, 16.1, 6.4, 22.7, 27.6],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 13.5, 11.2, 10.9, 21.2, 26.6],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17.6, 24.2, 18.7, 21.2],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14.2, 31.5, 35.5],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28.8, 33.6],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+real_dist = [
+              [0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 8.5, 0, 0, 0, 0, 0, 10, 3.5, 0, 0, 0, 0],
+              [0, 0, 0, 6.3, 0, 0, 0, 0, 9.4, 0, 0, 0, 18.7, 0],
+              [0, 0, 0, 0, 13, 0, 0, 15.3, 0, 0, 0, 0, 12.8, 0],
+              [0, 0, 0, 0, 0, 3, 2.4, 30, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 9.6, 0, 0, 6.4, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12.2, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5.1],
+              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+
+
+def kmh_to_min(arr):
+    for i in range(14):
+        for j in range(14):
+            arr[i][j] = arr[i][j]*2
+    return arr
+    #função q multiplica o array todo por 2:
+    #como a velocidade média é 30km/h, para converter de
+    #velocidade média para minutos, basta multiplicar por 2
+
+
+dir_dist = kmh_to_min(dir_dist)
+real_dist = kmh_to_min(real_dist)
+print(dir_dist)
+print(real_dist)
+
+
+
+def valid_Station(station):
+    if station[0] == "E" and station[1:].isnumeric():
+        if int(station[1:]) > 0 and int(station[1:]) <= 14:
+            return True
+    else:
+        print("Estação Inválida")
+        return False
+
+
+
+def h(currentStation, finalStation):
+    if currentStation == finalStation:
+        return 0
+    if (dir_dist[currentStation][finalStation] == 0):
+      return dir_dist[finalStation][currentStation]
+    return dir_dist[currentStation][finalStation]
+
+
+
+def g(currentStation, index, pastStations, initialLine):
+    changeLine = 0
+
+    if initialLine == 0:
+        if currentStation and pastStations[-1] in line1:
+            initialLine = 1
+        elif currentStation and pastStations[-1] in line2:
+            initialLine = 2
+        elif currentStation and pastStations[-1] in line3:
+            initialLine = 3
+        elif currentStation and pastStations[-1] in line4:
+            initialLine = 4
+    
+    if initialLine == 1:
+        if index not in line1:
+            changeLine = 4
+            if currentStation in line2 and index in line2:
+                currentLine = 2
+            elif currentStation in line3 and index in line3:
+                currentLine = 3
+            elif currentStation in line4 and index in line4:
+                currentLine = 4
+    elif initialLine == 2:
+        if index not in line2:
+            changeLine = 4
+            if currentStation in line1 and index in line1:
+                currentLine = 1
+            elif currentStation in line3 and index in line3:
+                currentLine = 3
+            elif currentStation in line4 and index in line4:
+                currentLine = 4
+    elif initialLine == 3:
+        if index not in line3:
+            changeLine = 4
+            if currentStation in line1 and index in line1:
+                currentLine = 1
+            elif currentStation in line2 and index in line2:
+                currentLine = 2
+            elif currentStation in line4 and index in line4:
+                currentLine = 4
+    elif initialLine == 4:
+        if index not in line4:
+            changeLine = 4
+            if currentStation in line1 and index in line1:
+                currentLine = 1
+            elif currentStation in line2 and index in line2:
+                currentLine = 2
+            elif currentStation in line3 and index in line3:
+                currentLine = 3
+    
+
+    
+    #print("currentStation: ", currentStation, ", index: ", index)
+    #print("pastStations: ", pastStations)
+    #print("initialLine: ", initialLine)
+    #print("changeLine: ", changeLine)
+    #print(real_dist[currentStation][index] + changeLine)
+
+    return real_dist[currentStation][index] + changeLine
+
+
+
+def getKey(item):
+  return item[1]
+
+
+
+def caminhoSemSaida(currentStation, nextStation, destStation):
+  index = 0
+  if nextStation == destStation:
+    return False
+  for dist in real_dist[nextStation]: #linha
+    if dist != 0:
+      if index != currentStation:
+        return False
+    index += 1
+  index = 0
+  for station in real_dist: #coluna
+    if station[nextStation] != 0:
+      if index != currentStation:
+        return False
+    index += 1
+  return True
+
+
+
+def is_loop(pastStations, index):
+    for item in pastStations:
+        if item == index:
+            return False
+    return True
+
+
+
+#expand_border: chama connectedStations, aplica h e g
+#e ordena
+def expand_border(currentStation, destStation, currentCost, pastStation, initialLine):
+  border = [[currentStation, currentCost],[]]
+  index = 0;
+  for dist in real_dist[currentStation]: #linha
+    if dist != 0:
+      if is_loop(pastStation, index):
+          if not caminhoSemSaida(currentStation, index, destStation):
+            cost = currentCost + h(index, destStation) + g(currentStation, index, pastStation, initialLine)
+            #print("return da g: ", g(currentStation, index, pastStation, initialLine))
+            #print("return da h: ", h(index, destStation))
+            #print("currentCost: ", currentCost)
+            border[1].append((index + 1, cost, g(currentStation, index, pastStation, initialLine)))
+    index += 1#index coluna
+  index = 0
+  for station in real_dist: #coluna
+    if station[currentStation] != 0:
+      if is_loop(pastStation, index):
+          if not caminhoSemSaida(currentStation, index, destStation):
+            cost = currentCost + h(index, destStation) + g(index, currentStation, pastStation, initialLine)
+            #print(g(index, currentStation, pastStation, initialLine))
+            #print("...")
+            #print("cost: ", cost)
+            border[1].append((index + 1, cost, g(index, currentStation, pastStation, initialLine)))
+    index += 1#index linha
+  currentAndBorders = (border[0], sorted(border[1], key=getKey))
+  return currentAndBorders
+
+
+def shrek():
+    print("\n\n          _      _         _____ _______       _____   \n     /\   | |    | |       / ____|__   __|/\   |  __ \  \n    /  \  | |    | |      | (___    | |  /  \  | |__) | \n   / /\ \ | |    | |       \___ \   | | / /\ \ |  _  /  \n  / ____ \| |____| |____   ____) |  | |/ ____ \| | \ \  \n /_/    \_\______|______| |_____/   |_/_/    \_\_|  \_\ \n                                                       ")
+    print("⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆\n⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿\n⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀\n⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉")
+
+
+
+def main():
+
+    #sStation = input()
+    #dStation = input()
+    sStation = 7
+    dStation = 12
+
+    #chama valid_station com as 2 estações
+    #valid_Station(sStation)
+    #valid_Station(dStation)
+
+    #Apagar depois
+    startStation = sStation
+    destStation = dStation
+
+    #subtrai 1 pra ficar mais facil usar o array
+    #sStationIndex = int(sStation[1:]) - 1
+    #dStationIndex = int(dStation[1:]) - 1
+    sStationIndex = startStation-1
+    dStationIndex = destStation-1
+    
+    f = dir_dist[sStationIndex][dStationIndex]
+    h = f
+    g = 0
+    pastStations = []
+    pastStations.append(startStation - 1)
+    initialLine = 0
+
+    currentCost = 0
+    border = ""
+    test = 0
+    print('E{}'.format(startStation))
+    while startStation != destStation:
+      currentStationAndCost, border = expand_border(startStation - 1, destStation - 1, currentCost, pastStations, initialLine)
+      startStation = border[0][0]
+      currentCost += border[0][2]
+      pastStations.append(startStation - 1)
+      print(border)
+      print('E{}'.format(startStation))
+    print('Cost{}'.format(currentCost))
+    print(pastStations)
+    shrek()
+       
+main()
