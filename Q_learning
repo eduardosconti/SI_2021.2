@@ -1,0 +1,167 @@
+import numpy as np
+import random
+import copy
+
+def update_q_table(q_table, position, action, nextState):
+    r = 0
+    yIndex = 0
+    xIndex = 1
+
+    if position == 1:
+        yIndex = 0
+    elif position == 2:
+        yIndex = 1
+    elif position == 3:
+        yIndex = 2
+    elif position == 4:
+        yIndex = 3
+    elif position == 5:
+        yIndex = 4
+    elif position == 6:
+        yIndex = 5
+    else:
+        print("ERRO")
+    
+    if nextState == 1:
+        yNextIndex = 0
+    elif nextState == 2:
+        yNextIndex = 1
+    elif nextState == 3:
+        yNextIndex = 2
+    elif nextState == 4:
+        yNextIndex = 3
+    elif nextState == 5:
+        yNextIndex = 4
+    elif nextState == 6:
+        yNextIndex = 5
+    else:
+        print("ERRO")
+
+    if action == "U":
+        xIndex = 0
+    elif action == "D":
+        xIndex = 1
+    elif action == "L":
+        xIndex = 2
+    elif action == "R":
+        xIndex = 3
+    else:
+        print("ERRO")
+
+    if position == nextState:
+        r = -10
+    elif nextState == 6:
+        r = 10
+    else:
+        r = -1
+
+    estimate = r + (gamma * max(q_table[yNextIndex]))
+    q_table[yIndex][xIndex] = alpha * estimate
+    
+
+    return q_table
+
+def main():
+    global actions
+    global positions
+    global alpha
+    global gamma
+    global rewards
+
+    #ações
+    actions = ["U", "D", "L", "R"]
+    q_table = np.zeros((6,4))
+    q_table[5] = 1
+
+    positions = [(0,0), (0,1), (1,0), (1,1), (2,0), (2,1)]
+    alpha = 0.5
+    gamma = 1
+
+    traj1 = [1, 2, 2, 2, 1, 3, 3, 3, 5, 6]
+    traj1Actions = ["U", "D", "R", "L", "R", "L", "L", "U", "R", "END"]
+    traj2 = [1, 3, 5, 3, 3, 5, 6]
+    traj2Actions = ["U", "U", "L", "L", "L", "R", "END"]
+    traj3 = [1, 1, 3, 5, 5, 5, 5, 3, 5, 5, 6]
+    traj3Actions = ["D", "U", "R", "U", "D", "L", "D", "U", "R", "R", "END"]
+    traj4 = [1, 3, 4, 6]
+    traj4Actions = ["U", "R", "U", "END"]
+    traj5 = [1, 1, 1, 3, 5, 5, 3, 5, 5, 5, 3, 3, 3, 4, 6]
+    traj5Actions = ["L", "U", "U", "U", "L", "D", "U", "U", "U", "D", "U", "L", "R", "U", "END"]
+
+
+    for item in traj1[:-1]:
+        itemIndex = traj1.index(item)
+        q_table = update_q_table(q_table, item, traj1Actions[itemIndex], traj1[itemIndex+1])
+        traj1.remove(item)
+        traj1Actions.pop(0)
+
+    for item in traj2[:-1]:
+        itemIndex = traj2.index(item)
+        q_table = update_q_table(q_table, item, traj2Actions[itemIndex], traj2[itemIndex+1])
+        traj2.remove(item)
+        traj2Actions.pop(0)
+
+    for item in traj3[:-1]:
+        itemIndex = traj3.index(item)
+        q_table = update_q_table(q_table, item, traj3Actions[itemIndex], traj3[itemIndex+1])
+        traj3.remove(item)
+        traj3Actions.pop(0)
+
+    for item in traj4[:-1]:
+        itemIndex = traj4.index(item)
+        q_table = update_q_table(q_table, item, traj4Actions[itemIndex], traj4[itemIndex+1])
+        traj4.remove(item)
+        traj4Actions.pop(0)
+
+    for item in traj5[:-1]:
+        itemIndex = traj5.index(item)
+        q_table = update_q_table(q_table, item, traj5Actions[itemIndex], traj5[itemIndex+1])
+        traj5.remove(item)
+        traj5Actions.pop(0)
+
+
+    pol = []
+    pol1 = []
+    b = []
+
+    for line in q_table:
+        for item in line:
+            if item == max(line):
+                b.append(item)
+                break
+
+    q_table1 = q_table[:-1]
+    print(q_table1)
+    a = []
+
+    for line in q_table[:-1]:
+        for item in line:
+            a.append(item)
+    
+    controle = 0
+    for item in b[:-1]:
+        pol.append(a.index(item) + controle)
+        a.remove(item)
+        controle += 1
+        
+    for item in pol:
+        pol1.append(item % 4)     
+
+    for item in pol1:
+        if item == 0:
+            pol.append("U")
+        elif item == 1:
+            pol.append("D")
+        elif item == 2:
+            pol.append("L")
+        elif item == 3:
+            pol.append("R")
+
+    print()
+    print()
+    print("POLITICA: ")
+    print(pol[4], " 1")
+    print(pol[2], " ", pol[3])
+    print(pol[0], " ", pol[1])
+
+main()
